@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<form action="" method="post">
+  {{ form.hidden_tag() }}
+  <div class="form-group">
+    <label for="username">{{ form.username.label }}</label>
+    {{ form.username(class="form-control col-sm-4",id="username") }}
+  </div>
+
+  <div class="form-group">
+    <label for="password">{{ form.password.label }}</label>
+    {{ form.password(class="form-control col-sm-4",id="password") }}
+  </div>
+
+  {{form.login_submit(class="btn btn-primary")}}
+
+<br><br>
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{category}} col-sm-4" role="alert">
+{{ message }}
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+{% endblock %}

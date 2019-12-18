@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<ul class="nav nav-tabs" id="adminTab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="design-tab" data-toggle="tab" href="#designs" role="tab" aria-controls="designs" aria-selected="true">Designs</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="admin-tab" data-toggle="tab" href="#admin" role="tab" aria-controls="admin" aria-selected="false">Admin Management</a>
+  </li>
+</ul>
+
+<div class="tab-content" id="adminTabContent">
+  <div class="tab-pane fade show active" id="designs" role="tabpanel" aria-labelledby="design-tab">
+    <br>
+    <p>Approve designs here</p>
+
+  </div>
+  <div class="tab-pane fade" id="admin" role="tabpanel" aria-labelledby="admin-tab">
+    <br>
+    <form action="" method="post">
+      {{ admin_form.hidden_tag() }}
+      <div class="form-group">
+        <label for="username">{{ admin_form.username.label }}</label>
+        {{ admin_form.username(class="form-control col-sm-4",id="username") }}
+      </div>
+
+        {{admin_form.admin_submit(class="btn btn-primary")}}
+  </div>
+
+</div>
+
+<br>
+
+<br><br>
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{category}} col-sm-4" role="alert">
+{{ message }}
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<form action="" method="post">
+  {{ form.hidden_tag() }}
+  <div class="form-group">
+    <label for="username">{{ form.username.label }}</label>
+    {{ form.username(class="form-control col-sm-4",id="username") }}
+  </div>
+
+  <div class="form-group">
+    <label for="name">{{ form.name.label }}</label>
+    {{ form.name(class="form-control col-sm-4",id="name") }}
+  </div>
+
+  <div class="form-group">
+    <label for="password1">{{form.password.label}}</label>
+    {{form.password(class="form-control col-sm-4",id="password1")}}
+  </div>
+
+  <div class="form-group">
+    <label for="password2">{{form.password2.label}}</label>
+    {{form.password2(class="form-control col-sm-4",id="password2")}}
+  </div>
+
+  {{form.register_submit(class="btn btn-primary")}}
+
+  <hr>
+  <p> Already registered? Click <a href="/login">here</a> to login.</p>
+
+
+<br><br>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  {% for category, message in messages %}
+  <div class="alert alert-{{category}} col-sm-4" role="alert">
+  {{ message }}
+  </div>
+  {% endfor %}
+  {% endif %}
+  {% endwith %}
+
+{% endblock %}
