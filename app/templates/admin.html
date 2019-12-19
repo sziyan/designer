@@ -7,30 +7,64 @@
     <a class="nav-link active" id="design-tab" data-toggle="tab" href="#designs" role="tab" aria-controls="designs" aria-selected="true">Designs</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" id="admin-tab" data-toggle="tab" href="#admin" role="tab" aria-controls="admin" aria-selected="false">Admin Management</a>
+    <a class="nav-link" id="user-tab" data-toggle="tab" href="#user" role="tab" aria-controls="user" aria-selected="false">User Management</a>
   </li>
 </ul>
 
 <div class="tab-content" id="adminTabContent">
+  <!-- Design Tab -->
   <div class="tab-pane fade show active" id="designs" role="tabpanel" aria-labelledby="design-tab">
     <br>
     <p>Approve designs here</p>
-
   </div>
-  <div class="tab-pane fade" id="admin" role="tabpanel" aria-labelledby="admin-tab">
+
+  <!-- User Management Tab -->
+  <div class="tab-pane fade" id="user" role="tabpanel" aria-labelledby="user-tab">
     <br>
-    <form action="" method="post">
-      {{ admin_form.hidden_tag() }}
-      <div class="form-group">
-        <label for="username">{{ admin_form.username.label }}</label>
-        {{ admin_form.username(class="form-control col-sm-4",id="username") }}
+<!-- Buttons -->
+    <div id="admin_button">
+    <p>
+      <!-- Add Admin button -->
+    <button class="btn btn-success" type="button" data-toggle="collapse" data-target="#add_admin" aria-expanded="false" aria-controls="add_admin">
+        Add Admin
+    </button>
+    <!-- Add Designer button -->
+    <button class="btn btn-warning" type="button" data-toggle="collapse"  data-target="#add_designer" aria-expanded="false" aria-controls="add_designer">
+        Add Designer
+    </button>
+    </p>
+
+    <!-- "Add admin" collapse -->
+    <div class="collapse" id="add_admin" data-parent="#admin_button">
+      <div class="card card-body">
+        <form action="" method="post">
+          {{ admin_form.hidden_tag() }}
+
+          <div class="form-group">
+            <label for="username">{{ admin_form.username.label }}</label>
+            {{ admin_form.username(class="form-control col-sm-4",id="username") }}
+          </div>
+            {{admin_form.admin_submit(class="btn btn-primary")}}
+          </form>
+        </div>
+      </div>
+      <!-- Add designer collapse -->
+      <div class="collapse" id="add_designer" data-parent="#admin_button">
+        <div class="card card-body">
+          <form action="" method="post">
+            {{ designer_form.hidden_tag() }}
+
+            <div class="form-group">
+              <label for="username">{{ designer_form.username.label }}</label>
+              {{ designer_form.username(class="form-control col-sm-4",id="username") }}
+            </div>
+              {{designer_form.designer_submit(class="btn btn-primary")}}
+            </form>
+          </div>
       </div>
 
-        {{admin_form.admin_submit(class="btn btn-primary")}}
+    </div>
   </div>
-
-</div>
-
 <br>
 
 <br><br>
