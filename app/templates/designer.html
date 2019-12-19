@@ -6,11 +6,22 @@
   {{form.hidden_tag()}}
 
   <div class="form-group">
-  <p>Upload your designs:</p> <br>
-    {{form.file()}} <br><br>
-    {{form.file_submit}}
+  <label for="designupload"><b>Upload your design</b></label>
+    {{form.file(class="form-control-file", id="designupload")}}<br>
+    {{form.file_submit(class="btn btn-primary")}}
 
     </div>
 
 </form>
+
+<br>
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{category}} col-sm-6" role="alert">
+{{ message }}
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
 {% endblock %}

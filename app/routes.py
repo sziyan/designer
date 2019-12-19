@@ -4,11 +4,11 @@ from app import app, db
 from app.forms import LoginForm, RegisterForm, AdminForm, DesignerForm, UploadDesign
 from app.models import User, Designs
 import os
-
+from os import path
 from werkzeug.utils import secure_filename
 
-UPLOAD_FOLDER = '/designs/'
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+UPLOAD_FOLDER = os.path.join(app.root_path, 'designs')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route("/")
@@ -74,6 +74,7 @@ def admin():
     if current_user.isAdmin is not True:
         return redirect(url_for('index'))
     else:
+        all_designs = Designs.query.all()
         admin_form = AdminForm()
         admin_form.update_choices()
         designer_form = DesignerForm()
@@ -97,15 +98,36 @@ def admin():
                 return redirect(url_for('admin'))
             else:
                 flash("User does not exist.", "danger")
-        return render_template('admin.html', admin_form=admin_form, designer_form=designer_form)
+        return render_template('admin.html', admin_form=admin_form, designer_form=designer_form, designs=all_designs)
 
 @app.route('/designer', methods=['POST', 'GET'])
 @login_required
 def designer():
+
     if current_user.isDesigner is not True:
         return redirect(url_for('index'))
     else:
         form = UploadDesign()
+        if form.validate_on_submit():
+            file = form.file.data
+            if file.filename == '':
+                flash("File must contain a filename!", "danger")
+                return redirect(url_for('designer'))
+            user = User.query.filter_by(username=current_user.username).first()
+            filename = secure_filename(file.filename)
+            folder_name = os.path.join(app.config['UPLOAD_FOLDER'],current_user.username)
+            if path.exists(folder_name) is not True:
+                os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], current_user.username), exist_ok=True)
+            if path.isfile(os.path.join(folder_name, filename)) is not True:
+                file.save(os.path.join(folder_name, filename))
+                file_path = os.path.join(folder_name, filename)
+                design = Designs(design_path=file_path, designer=user)
+                db.session.add(design)
+                db.session.commit()
+                flash("File uploaded successfully", "success")
+            else:
+                flash("File already exists in our system. Please wait for your design to be approved before submiting a new design.", "danger")
+            return redirect(url_for('designer'))
         return render_template('designer.html', form=form)
 
 @app.errorhandler(404)

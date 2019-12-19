@@ -15,7 +15,14 @@
   <!-- Design Tab -->
   <div class="tab-pane fade show active" id="designs" role="tabpanel" aria-labelledby="design-tab">
     <br>
-    <p>Approve designs here</p>
+    {% for d in designs %}
+    <div class="card" style="width: 18rem;">
+  <img class="card-img-top" src="/designs/yishan/ys.jpg" alt="Card image cap">
+  <div class="card-body">
+    <p class="card-text">Uploaded by {{d.user_name}}</p>
+  </div>
+</div>
+  {% endfor %}
   </div>
 
   <!-- User Management Tab -->
@@ -23,16 +30,23 @@
     <br>
 <!-- Buttons -->
     <div id="admin_button">
-    <p>
+
       <!-- Add Admin button -->
+      <div class="row">
+      <div class="col-sm-2">
     <button class="btn btn-success" type="button" data-toggle="collapse" data-target="#add_admin" aria-expanded="false" aria-controls="add_admin">
         Add Admin
     </button>
+    </div>
+    <div class="col-sm-2">
     <!-- Add Designer button -->
     <button class="btn btn-warning" type="button" data-toggle="collapse"  data-target="#add_designer" aria-expanded="false" aria-controls="add_designer">
         Add Designer
     </button>
-    </p>
+    </div>
+    </div>
+    <br>
+
 
     <!-- "Add admin" collapse -->
     <div class="collapse" id="add_admin" data-parent="#admin_button">

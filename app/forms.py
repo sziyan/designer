@@ -46,5 +46,5 @@ class DesignerForm(FlaskForm):
         self.username.choices = new_choice
 
 class UploadDesign(FlaskForm):
-    file = FileField()
+    file = FileField(validators=[InputRequired()])
     file_submit = SubmitField('Upload')
