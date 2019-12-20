@@ -7,14 +7,15 @@ import os
 from os import path
 from werkzeug.utils import secure_filename
 
-UPLOAD_FOLDER = os.path.join(app.root_path, 'designs')
+#UPLOAD_FOLDER = os.path.join(app.root_path, 'designs')
+UPLOAD_FOLDER = 'app/static/designs'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route("/")
 @app.route("/index")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", title='Index - Designer Concept')
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -41,7 +42,7 @@ def register():
         else: #user exist
             flash('Account already exists', 'danger')
             return redirect(url_for('register'))
-    return render_template('register.html', form=form)
+    return render_template('register.html', form=form, title='Register - Designer Concept')
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -60,7 +61,7 @@ def login():
             else:
                 flash('Incorrect password', 'danger')
                 return redirect(url_for('login'))
-    return render_template('login.html', form=form)
+    return render_template('login.html', form=form, title='Login - Designer Concept')
 
 @app.route('/logout')
 @login_required
@@ -98,7 +99,7 @@ def admin():
                 return redirect(url_for('admin'))
             else:
                 flash("User does not exist.", "danger")
-        return render_template('admin.html', admin_form=admin_form, designer_form=designer_form, designs=all_designs)
+        return render_template('admin.html',title='Admin - Designer Concept', admin_form=admin_form, designer_form=designer_form, designs=all_designs)
 
 @app.route('/designer', methods=['POST', 'GET'])
 @login_required
@@ -114,22 +115,30 @@ def designer():
                 flash("File must contain a filename!", "danger")
                 return redirect(url_for('designer'))
             user = User.query.filter_by(username=current_user.username).first()
-            filename = secure_filename(file.filename)
+            file_format = file.filename.split('.')[-1]
+            file_id = str(len(Designs.query.filter_by(user_name=current_user.username).all())+1)
+            filename = secure_filename(file_id + '.' + file_format)
             folder_name = os.path.join(app.config['UPLOAD_FOLDER'],current_user.username)
+            print(folder_name)
             if path.exists(folder_name) is not True:
                 os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], current_user.username), exist_ok=True)
             if path.isfile(os.path.join(folder_name, filename)) is not True:
                 file.save(os.path.join(folder_name, filename))
-                file_path = os.path.join(folder_name, filename)
-                design = Designs(design_path=file_path, designer=user)
+                file_path = current_user.username + '/' + filename
+                design = Designs(file_path=file_path, designer=user)
                 db.session.add(design)
                 db.session.commit()
                 flash("File uploaded successfully", "success")
+                return redirect(url_for('designer'))
             else:
                 flash("File already exists in our system. Please wait for your design to be approved before submiting a new design.", "danger")
             return redirect(url_for('designer'))
-        return render_template('designer.html', form=form)
+        return render_template('designer.html', title='Designer Page', form=form)
 
 @app.errorhandler(404)
-def error404(e):
+def error404(e): #Page not found
     return render_template('404.html')
+
+@app.errorhandler(401) #No login access
+def error404(e):
+    return render_template('401.html')

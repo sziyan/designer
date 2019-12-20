@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 19dd471153a0
+Revision ID: cd463f873b39
 Revises: 
-Create Date: 2019-12-18 15:59:48.112327
+Create Date: 2019-12-20 13:34:53.986051
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '19dd471153a0'
+revision = 'cd463f873b39'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,22 +22,24 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(length=64), nullable=True),
     sa.Column('name', sa.String(length=64), nullable=True),
+    sa.Column('email', sa.String(length=128), nullable=True),
     sa.Column('password_hash', sa.String(length=128), nullable=True),
     sa.Column('isDesigner', sa.Boolean(), nullable=True),
     sa.Column('isAdmin', sa.Boolean(), nullable=True),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('email')
     )
     op.create_index(op.f('ix_user_name'), 'user', ['name'], unique=False)
     op.create_index(op.f('ix_user_username'), 'user', ['username'], unique=True)
     op.create_table('designs',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('design_path', sa.String(length=128), nullable=True),
+    sa.Column('file_path', sa.String(length=128), nullable=True),
     sa.Column('votes', sa.Integer(), nullable=True),
     sa.Column('isApproved', sa.Boolean(), nullable=True),
     sa.Column('user_name', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['user_name'], ['user.username'], ),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('design_path')
+    sa.UniqueConstraint('file_path')
     )
     # ### end Alembic commands ###
 

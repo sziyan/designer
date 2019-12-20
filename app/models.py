@@ -34,9 +34,9 @@ class User(UserMixin, db.Model):
 
 class Designs(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    design_path = db.Column(db.String(128), unique=True)
+    file_path = db.Column(db.String(128), unique=True)
     votes = db.Column(db.Integer,nullable=True)
-    isApproved = db.Column(db.Boolean, nullable=True)
+    isApproved = db.Column(db.Integer, nullable=True)
     user_name = db.Column(db.Integer, db.ForeignKey('user.username'))
 
     def toggle_approved(self):
