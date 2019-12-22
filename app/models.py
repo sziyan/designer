@@ -36,11 +36,14 @@ class Designs(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     file_path = db.Column(db.String(128), unique=True)
     votes = db.Column(db.Integer,nullable=True)
-    isApproved = db.Column(db.Integer, nullable=True)
+    isApproved = db.Column(db.Boolean, nullable=True)
+    isRejected = db.Column(db.Boolean, nullable=True)
     user_name = db.Column(db.Integer, db.ForeignKey('user.username'))
 
-    def toggle_approved(self):
-        if self.isApproved:
-            self.isApproved = False
-        else:
-            self.isApproved = True
+    def set_approve(self):
+        self.isApproved = True
+        self.isRejected = False
+
+    def set_reject(self):
+        self.isRejected = True
+        self.isApproved = False

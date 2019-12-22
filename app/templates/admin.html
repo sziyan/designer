@@ -14,6 +14,23 @@
   <!-- Design Tab -->
   <div class="tab-pane fade show active" id="designs" role="tabpanel" aria-labelledby="design-tab">
     <br>
+<!-- Set name of tabs -->
+    <ul class="nav nav-tabs" id="designer_designs" role="tablist">
+<li class="nav-item">
+  <a class="nav-link active" id="pending-tab" data-toggle="tab" href="#pending" role="tab" aria-controls="pending" aria-selected="true">Pending</a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" id="approved-tab" data-toggle="tab" href="#approved" role="tab" aria-controls="approved" aria-selected="false">Approved</a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" id="rejected-tab" data-toggle="tab" href="#rejected" role="tab" aria-controls="rejected" aria-selected="false">Rejected</a>
+</li>
+</ul>
+
+
+<div class="tab-content" id="myDesignsContent">
+  <!-- Pending Tab -->
+  <div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="pending-tab">
     <table class="table">
       <thead>
         <tr>
@@ -24,46 +41,170 @@
       </thead>
       <tbody>
         {% for d in designs %}
+        {%if d.isApproved is none and d.isRejected is none %}
         <tr>
           <td>{{d.id}}</td>
           <td>{{d.user_name}}</td>
           <td><a href="modal{{d.id}}" data-toggle="modal" data-target="#modal{{d.id}}">View</a></td>
         </tr>
+        {% endif %}
         {% endfor %}
       </tbody>
     </table>
-</div>
-
-<!-- Modal management -->
-{% for d in designs %}
-<div class="modal fade" id="modal{{d.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">{{d.username}}</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <center><img style="width: 200px" src="/static/designs/{{d.file_path}}"></img></center>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Reject</button>
-        <button type="button" class="btn btn-primary">Approve</button>
+    <!-- Pending tab Modal management -->
+    {% for d in designs %}
+    {% if d.isApproved is none and d.isRejected is none %}
+    <div class="modal fade" id="modal{{d.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalLabel">{{d.user_name}}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <center><img style="width: 200px" src="/static/designs/{{d.file_path}}"></img></center>
+          </div>
+          <div class="modal-footer">
+            <!-- Reject button -->
+            <form action="" method="post">
+              {{reject.csrf_token()}}
+              {{reject.id(value=d.id)}}
+              {{reject.reject_submit(class="btn btn-danger", id="reject")}}
+            </form>
+            <!--Approve button -->
+            <form action="" method="post">
+              {{approve.csrf_token()}}
+              {{approve.id(value=d.id)}}
+              {{approve.approve_submit(class="btn btn-primary", id="approve")}}
+            </form>
+          </div>
+        </div>
       </div>
     </div>
+    {% endif %}
+    {% endfor %}
+
+  </div>
+  <!-- Approved tab -->
+  <div class="tab-pane fade" id="approved" role="tabpanel" aria-labelledby="approved-tab">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Submitted</th>
+          <th scope="col">View</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in designs %}
+        {% if d.isApproved == 1 %}
+        <tr>
+          <td>{{d.id}}</td>
+          <td>{{d.user_name}}</td>
+          <td><a href="modal{{d.id}}" data-toggle="modal" data-target="#modal{{d.id}}">View</a></td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+    <!-- Approved tab Modal management -->
+    {% for d in designs %}
+    {% if d.isApproved == True %}
+    <div class="modal fade" id="modal{{d.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalLabel">{{d.user_name}}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <center><img style="width: 200px" src="/static/designs/{{d.file_path}}"></img></center>
+          </div>
+          <div class="modal-footer">
+            <form action="" method="post">
+              {{reject.csrf_token()}}
+              {{reject.id(value=d.id)}}
+              {{reject.reject_submit(class="btn btn-danger", id="reject")}}
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+
+  </div>
+  <!-- Rejected tab -->
+  <div class="tab-pane fade" id="rejected" role="tabpanel" aria-labelledby="rejected-tab">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Submitted</th>
+          <th scope="col">View</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in designs %}
+        {% if d.isRejected == True %}
+        <tr>
+          <td>{{d.id}}</td>
+          <td>{{d.user_name}}</td>
+          <td><a href="modal{{d.id}}" data-toggle="modal" data-target="#modal{{d.id}}">View</a></td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+    <!-- Rejected tab Modal management -->
+    {% for d in designs %}
+    {% if d.isRejected == True %}
+    <div class="modal fade" id="modal{{d.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalLabel">{{d.user_name}}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <center><img style="width: 200px" src="/static/designs/{{d.file_path}}"></img></center>
+          </div>
+          <div class="modal-footer">
+            <form action="" method="post">
+              {{approve.csrf_token()}}
+              {{approve.id(value=d.id)}}
+              {{approve.approve_submit(class="btn btn-primary", id="reject")}}
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+
+
   </div>
 </div>
-{% endfor %}
 
+
+
+
+
+
+
+</div>
   <!-- User Management Tab -->
   <div class="tab-pane fade" id="user" role="tabpanel" aria-labelledby="user-tab">
-    <br>
+<br><br>
 <!-- Buttons -->
     <div id="admin_button">
-
       <!-- Add Admin button -->
       <div class="row">
       <div class="col-sm-2">
@@ -112,6 +253,7 @@
 
     </div>
   </div>
+</div>
 <br>
 
 <br><br>
@@ -124,5 +266,4 @@
 {% endfor %}
 {% endif %}
 {% endwith %}
-
 {% endblock %}

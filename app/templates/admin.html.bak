@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<ul class="nav nav-tabs" id="adminTab" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="design-tab" data-toggle="tab" href="#designs" role="tab" aria-controls="designs" aria-selected="true">Designs</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="user-tab" data-toggle="tab" href="#user" role="tab" aria-controls="user" aria-selected="false">User Management</a>
+  </li>
+</ul>
+
+<div class="tab-content" id="adminTabContent">
+  <!-- Design Tab -->
+  <div class="tab-pane fade show active" id="designs" role="tabpanel" aria-labelledby="design-tab">
+    <br>
+    <!-- Designs tab -->
+    <ul class="nav nav-tabs" id="designstab" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" id="design_pending" data-toggle="tab" href="#pending" role="tab" aria-controls="pending" aria-selected="true">Pending</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="design_approve" data-toggle="tab" href="#approve" role="tab" aria-controls="approve" aria-selected="false">Approved</a>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="designTabContent">
+      <div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="designed-tab">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Submitted</th>
+              <th scope="col">View</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for d in designs %}
+            {%if d.isApproved is none %}
+            <tr>
+              <td>{{d.id}}</td>
+              <td>{{d.user_name}}</td>
+              <td><a href="modal{{d.id}}" data-toggle="modal" data-target="#modal{{d.id}}">View</a></td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tab-pane fade" id="approve" role="tabpanel" aria-labelledby="design-tab">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Submitted</th>
+              <th scope="col">View</th>
+            </tr>
+          </thead>
+          <tbody>
+        {% for d in designs %}
+        {% if d.isApproved == 1 %}
+        <tr>
+          <td>{{d.id}}</td>
+          <td>{{d.user_name}}</td>
+          <td><a href="modal{{d.id}}" data-toggle="modal" data-target="#modal{{d.id}}">View</a></td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- Modal management -->
+    {% for d in designs %}
+    {% if d.isApproved is none %}
+    <div class="modal fade" id="modal{{d.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalLabel">{{d.user_name}}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <center><img style="width: 200px" src="/static/designs/{{d.file_path}}"></img></center>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Dismiss</button>
+            <button type="button" class="btn btn-primary" value="reject">Reject</button>
+            <form action="" method="post">
+              {{approve.csrf_token()}}
+              {{approve.id(value=d.id)}}
+              {{approve.approve_submit(class="btn btn-primary", id="approve")}}
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+
+
+</div>
+  <!-- User Management Tab -->
+  <div class="tab-pane fade" id="user" role="tabpanel" aria-labelledby="user-tab">
+
+<!-- Buttons -->
+    <div id="admin_button">
+      <!-- Add Admin button -->
+      <div class="row">
+      <div class="col-sm-2">
+    <button class="btn btn-success" type="button" data-toggle="collapse" data-target="#add_admin" aria-expanded="false" aria-controls="add_admin">
+        Add Admin
+    </button>
+    </div>
+    <div class="col-sm-2">
+    <!-- Add Designer button -->
+    <button class="btn btn-warning" type="button" data-toggle="collapse"  data-target="#add_designer" aria-expanded="false" aria-controls="add_designer">
+        Add Designer
+    </button>
+    </div>
+    </div>
+    <br>
+
+
+    <!-- "Add admin" collapse -->
+    <div class="collapse" id="add_admin" data-parent="#admin_button">
+      <div class="card card-body">
+        <form action="" method="post">
+          {{ admin_form.hidden_tag() }}
+
+          <div class="form-group">
+            <label for="username">{{ admin_form.username.label }}</label>
+            {{ admin_form.username(class="form-control col-sm-4",id="username") }}
+          </div>
+            {{admin_form.admin_submit(class="btn btn-primary")}}
+          </form>
+        </div>
+      </div>
+      <!-- Add designer collapse -->
+      <div class="collapse" id="add_designer" data-parent="#admin_button">
+        <div class="card card-body">
+          <form action="" method="post">
+            {{ designer_form.hidden_tag() }}
+
+            <div class="form-group">
+              <label for="username">{{ designer_form.username.label }}</label>
+              {{ designer_form.username(class="form-control col-sm-4",id="username") }}
+            </div>
+              {{designer_form.designer_submit(class="btn btn-primary")}}
+            </form>
+          </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<br>
+
+<br><br>
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{category}} col-sm-4" role="alert">
+{{ message }}
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+{% endblock %}

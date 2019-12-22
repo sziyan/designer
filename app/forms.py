@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm, Form
-from wtforms import StringField, PasswordField, SubmitField, SelectField, FileField
+from wtforms import StringField, PasswordField, SubmitField, SelectField, FileField, HiddenField
 from wtforms.validators import InputRequired, Email
 from app.models import User
 
@@ -48,3 +48,11 @@ class DesignerForm(FlaskForm):
 class UploadDesign(FlaskForm):
     file = FileField(validators=[InputRequired()])
     file_submit = SubmitField('Upload')
+
+class Approve(FlaskForm):
+    id = HiddenField()
+    approve_submit = SubmitField('Approve')
+
+class Reject(FlaskForm):
+    id = HiddenField()
+    reject_submit = SubmitField('Reject')
