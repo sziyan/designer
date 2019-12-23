@@ -7,7 +7,6 @@ import os
 from os import path
 from werkzeug.utils import secure_filename
 
-#UPLOAD_FOLDER = os.path.join(app.root_path, 'designs')
 UPLOAD_FOLDER = 'app/static/designs'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'psd', 'ai'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -144,6 +143,8 @@ def designer():
                     return redirect(url_for('designer'))
                 else:
                     flash("File already exists in our system. Please wait for your design to be approved before submiting a new design.", "danger")
+            else:
+                flash('File type not supported', 'danger')
                 return redirect(url_for('designer'))
         return render_template('designer.html', title='Designer Page', form=form)
 

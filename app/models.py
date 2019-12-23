@@ -35,6 +35,7 @@ class User(UserMixin, db.Model):
 class Designs(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     file_path = db.Column(db.String(128), unique=True)
+    blueprint_path = db.Column(db.String(128), unique=True)
     votes = db.Column(db.Integer,nullable=True)
     isApproved = db.Column(db.Boolean, nullable=True)
     isRejected = db.Column(db.Boolean, nullable=True)
