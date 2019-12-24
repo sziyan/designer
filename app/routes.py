@@ -1,14 +1,15 @@
 from flask import render_template, redirect, url_for, flash
 from flask_login import current_user, login_user, login_required, logout_user
 from app import app, db
-from app.forms import LoginForm, RegisterForm, AdminForm, DesignerForm, UploadDesign, Approve, Reject
+from app.forms import LoginForm, RegisterForm, AdminForm, DesignerForm, UploadDesign, Approve, Reject, Vote
 from app.models import User, Designs
 import os
 from os import path
 from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = 'app/static/designs'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'psd', 'ai'}
+IMAGE_ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'psd', 'ai'}
+BLUEPRINT_ALLOWED_EXTENSIONS = {'psd','ai'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route("/")
@@ -16,9 +17,13 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def index():
     return render_template("index.html", title='Index - Designer Concept')
 
-def allowed_file(filename):
+def image_allowed_file(filename):
     return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+           filename.rsplit('.', 1)[1].lower() in IMAGE_ALLOWED_EXTENSIONS
+
+def blueprint_allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in BLUEPRINT_ALLOWED_EXTENSIONS
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
@@ -115,28 +120,34 @@ def admin():
 @app.route('/designer', methods=['POST', 'GET'])
 @login_required
 def designer():
-
     if current_user.isDesigner is not True:
         return redirect(url_for('index'))
     else:
         form = UploadDesign()
         if form.validate_on_submit():
             file = form.file.data
-            if file.filename == '':
+            blueprint = form.blueprint_file.data
+            if file.filename == '' or blueprint.filename == '': #filename empty
                 flash("File must contain a filename!", "danger")
                 return redirect(url_for('designer'))
-            if file and allowed_file(file.filename):
+            if (file and image_allowed_file(file.filename)) and (blueprint and blueprint_allowed_file(blueprint.filename)): #check file format
                 user = User.query.filter_by(username=current_user.username).first()
                 file_format = file.filename.split('.')[-1]
+                blueprint_file_format = blueprint.filename.split(".")[-1]
                 file_id = str(len(Designs.query.filter_by(user_name=current_user.username).all())+1)
                 filename = secure_filename(file_id + '.' + file_format)
-                folder_name = os.path.join(app.config['UPLOAD_FOLDER'],current_user.username)
-                if path.exists(folder_name) is not True:
-                    os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], current_user.username), exist_ok=True)
-                if path.isfile(os.path.join(folder_name, filename)) is not True:
-                    file.save(os.path.join(folder_name, filename))
-                    file_path = current_user.username + '/' + filename
-                    design = Designs(file_path=file_path, designer=user)
+                blueprint_filename = secure_filename(file_id+'.'+blueprint_file_format)
+                user_folder = os.path.join(app.config['UPLOAD_FOLDER'],current_user.username)
+                if path.exists(user_folder) is not True: #check if user upload directory exists
+                    os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], current_user.username), exist_ok=True) #create user folder
+                design_upload_folder = os.path.join(user_folder, file_id)
+                if path.exists(design_upload_folder) is not True: #current design folder not created yet
+                    os.makedirs(design_upload_folder, exist_ok=True) #create file_id folder
+                    file.save(os.path.join(design_upload_folder, filename))
+                    blueprint.save(os.path.join(design_upload_folder, blueprint_filename))
+                    design_folder = current_user.username + '/' + file_id
+                    image_path = design_folder+'/'+filename
+                    design = Designs(design_folder=design_folder,image_path=image_path, designer=user)
                     db.session.add(design)
                     db.session.commit()
                     flash("File uploaded successfully", "success")
@@ -144,9 +155,23 @@ def designer():
                 else:
                     flash("File already exists in our system. Please wait for your design to be approved before submiting a new design.", "danger")
             else:
-                flash('File type not supported', 'danger')
+                flash('File type not supported. Make sure to upload the correct file types.', 'danger')
                 return redirect(url_for('designer'))
         return render_template('designer.html', title='Designer Page', form=form)
+
+@app.route('/designs', methods=['GET','POST'])
+def designs():
+    approved_designs = Designs.query.filter_by(isApproved=True).all()
+    form = Vote()
+    if form.upvote.data and form.validate():
+        user = User.query.filter_by(username=current_user.username).first()
+        design = Designs.query.filter_by(id=form.id.data).first()
+        design.voter.append(user)
+        design.no_of_votes += 1
+        db.session.commit()
+        flash("Design upvoted successfully", "success")
+        return redirect(url_for('designs'))
+    return render_template('designs.html', designs=approved_designs, form=form)
 
 @app.errorhandler(404)
 def error404(e): #Page not found

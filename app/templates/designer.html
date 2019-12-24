@@ -8,16 +8,24 @@
 <p>Here, you can upload designs for our fans to vote on.</p>
 <p>Designs with the highest votes will be <i>highly considered</i> for our next design.</p>
 
-
+<br>
 <form action="" method="post" enctype="multipart/form-data">
   {{form.hidden_tag()}}
 
+<p>Upload your design in <b>PNG,JPG</b> or <b>JPEG</b>.</p>
+
   <div class="form-group">
     <div class="custom-file">
-      {{form.file(class="custom-file-input", id="designupload")}}
-  <label class="custom-file-label col-sm-4" for="designupload">Choose file</label>
-    <!-- {{form.file(class="form-control-file", id="designupload")}}<br> -->
+      {{form.file(class="custom-file-input", id="imageupload")}}
+  <label class="custom-file-label col-sm-12 col-md-6" for="imageupload">Choose file</label>
     </div>
+  </div>
+<p>Upload your raw design file in <b>PSD</b> or <b>AI</b></p>
+    <div class="form-group">
+      <div class="custom-file">
+        {{form.blueprint_file(class="custom-file-input", id="blueprintupload")}}
+    <label class="custom-file-label col-sm-12 col-md-6" for="blueprintupload">Choose file</label>
+      </div>
     <br><br>
     {{form.file_submit(class="btn btn-primary")}}
 
@@ -36,13 +44,21 @@
 {% endfor %}
 {% endif %}
 {% endwith %}
+
 <script>
-  $('#designupload').on('change',function(){
+  $('#imageupload').on('change',function(){
     //get the file name
     var fileName = $(this).val().replace('C:\\fakepath\\'," ");
   //replace the "Choose a file" label
    $(this).next('.custom-file-label').html(fileName);
-  })
+ });
+
+  $('#blueprintupload').on('change',function(){
+    //get the file name
+    var fileName = $(this).val().replace('C:\\fakepath\\'," ");
+  //replace the "Choose a file" label
+   $(this).next('.custom-file-label').html(fileName);
+ });
 </script>
 
 {% endblock %}
