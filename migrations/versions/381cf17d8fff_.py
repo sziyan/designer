@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: ee599f81c17e
+Revision ID: 381cf17d8fff
 Revises: 
-Create Date: 2019-12-22 22:15:39.782736
+Create Date: 2019-12-23 14:49:35.820137
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ee599f81c17e'
+revision = '381cf17d8fff'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -33,14 +33,17 @@ def upgrade():
     op.create_index(op.f('ix_user_username'), 'user', ['username'], unique=True)
     op.create_table('designs',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('file_path', sa.String(length=128), nullable=True),
-    sa.Column('votes', sa.Integer(), nullable=True),
+    sa.Column('design_folder', sa.String(length=128), nullable=True),
+    sa.Column('image_path', sa.String(length=128), nullable=True),
     sa.Column('isApproved', sa.Boolean(), nullable=True),
     sa.Column('isRejected', sa.Boolean(), nullable=True),
+    sa.Column('voter', sa.Integer(), nullable=True),
     sa.Column('user_name', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['user_name'], ['user.username'], ),
+    sa.ForeignKeyConstraint(['voter'], ['user.username'], ),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('file_path')
+    sa.UniqueConstraint('design_folder'),
+    sa.UniqueConstraint('image_path')
     )
     # ### end Alembic commands ###
 

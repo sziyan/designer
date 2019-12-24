@@ -12,10 +12,11 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), index=True, unique=True)
     name = db.Column(db.String(64), index=True)
     email = db.Column(db.String(128), unique=True)
-    password_hash = db.Column(db.String(128), nullable=True)
+    password_hash = db.Column(db.String(128))
     isDesigner = db.Column(db.Boolean, nullable=True)
     isAdmin = db.Column(db.Boolean, nullable=True)
-    designs = db.relationship('Designs', backref='designer', lazy='dynamic')
+    designs = db.relationship('Designs', backref='designer', lazy='dynamic', foreign_keys='designs.user_name')
+    designvotes = db.relationship('Designs', backref='voter', lazy='dynamic', foreign_keys='designs.voter')
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -34,11 +35,11 @@ class User(UserMixin, db.Model):
 
 class Designs(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    file_path = db.Column(db.String(128), unique=True)
-    blueprint_path = db.Column(db.String(128), unique=True)
-    votes = db.Column(db.Integer,nullable=True)
+    design_folder = db.Column(db.String(128), unique=True)
+    image_path = db.Column(db.String(128), unique=True)
     isApproved = db.Column(db.Boolean, nullable=True)
     isRejected = db.Column(db.Boolean, nullable=True)
+    voter = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=True)
     user_name = db.Column(db.Integer, db.ForeignKey('user.username'))
 
     def set_approve(self):
