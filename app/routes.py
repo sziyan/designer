@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, flash
 from flask_login import current_user, login_user, login_required, logout_user
 from app import app, db
-from app.forms import LoginForm, RegisterForm, AdminForm, DesignerForm, UploadDesign, Approve, Reject
+from app.forms import LoginForm, RegisterForm, AdminForm, DesignerForm, UploadDesign, Approve, Reject, Vote
 from app.models import User, Designs
 import os
 from os import path
@@ -162,9 +162,16 @@ def designer():
 @app.route('/designs', methods=['GET','POST'])
 def designs():
     approved_designs = Designs.query.filter_by(isApproved=True).all()
-    return render_template('designs.html', designs=approved_designs)
-
-
+    form = Vote()
+    if form.upvote.data and form.validate():
+        user = User.query.filter_by(username=current_user.username).first()
+        design = Designs.query.filter_by(id=form.id.data).first()
+        design.voter.append(user)
+        design.no_of_votes += 1
+        db.session.commit()
+        flash("Design upvoted successfully", "success")
+        return redirect(url_for('designs'))
+    return render_template('designs.html', designs=approved_designs, form=form)
 
 @app.errorhandler(404)
 def error404(e): #Page not found
