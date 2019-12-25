@@ -9,7 +9,7 @@
   </head>
   <body>
     <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-primary">
-      <a class="navbar-brand" href="#">{{current_user.name}}</a>
+      <a class="navbar-brand" href="/profile/{{current_user.username}}">{{current_user.name}}</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -48,6 +48,9 @@
     {% block content %}
     {% endblock %}
   </div>
-
+  <br><br>
+<!--footer -->
+<br><br>
+<center><p><b>Copyright 2019 - Designer Concept Store</b></p></center>
   </body>
 </html>

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h3>Profile</h3>
+<hr>
+<p><b>Username:</b> {{user.username}}</p>
+<p><b>Name:</b> {{user.name}}</p>
+<p><b>Email:</b> {{user.email}}</p>
+<p><b>Designer:</b> {{user.isDesigner}}</p>
+<hr>
+
+<h3>Submitted Designs:</h3>
+<hr>
+<h5>Approved</h5><br>
+{% for d in designs %}
+{% if d.isApproved == 1 %}
+<img src="/static/designs/{{d.image_path}}" width=400px></img>
+<br>
+{% endif %}
+{% endfor %}
+
+<br><br>
+<h5>Rejected</h5><br>
+{% for d in designs %}
+{% if d.isRejected == 1 %}
+<img src="/static/designs/{{d.image_path}}" width=400px></img>
+<br>
+{% endif %}
+{% endfor %}
+
+<br><br>
+<h5>Pending</h5><br>
+{% for d in designs %}
+{% if d.isRejected is none and d.isApproved is none %}
+<img src="/static/designs/{{d.image_path}}" width=400px></img>
+<br>
+{% endif %}
+{% endfor %}
+<hr>
+
+{% endblock %}

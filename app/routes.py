@@ -169,9 +169,18 @@ def designs():
         design.voter.append(user)
         design.no_of_votes += 1
         db.session.commit()
-        flash("Design upvoted successfully", "success")
         return redirect(url_for('designs'))
     return render_template('designs.html', designs=approved_designs, form=form)
+
+@app.route("/request")
+def request():
+    return render_template('request.html')
+
+@app.route('/profile/<username>')
+def profile(username):
+    user = User.query.filter_by(username=username).first()
+    user_designs = Designs.query.filter_by(user_name=username).all()
+    return render_template('profile.html', user=user, designs=user_designs)
 
 @app.errorhandler(404)
 def error404(e): #Page not found
