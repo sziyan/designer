@@ -58,3 +58,7 @@ class Approve(FlaskForm):
 class Reject(FlaskForm):
     id = HiddenField()
     reject_submit = SubmitField('Reject')
+
+class Vote(FlaskForm):
+    id = HiddenField()
+    upvote = SubmitField('Upvote')

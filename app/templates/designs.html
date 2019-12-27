@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h3>Vote your favorites</h3>
+<p>Vote for your favorite designs. <br>Your every vote helps to determine if the design will be choosen for our next batch!</p>
+<hr>
+
+{% for d in designs %}
+  {% if (designs.index(d)+1) % 3 == 1 %}
+<div class="row row-cols-1 row-cols-md-3">
+  {% endif %}
+  <div class="col mb-4">
+    <div class="card h-100">
+      <div class="card-header">
+        <b>Designed by: </b>{{d.user_name}}
+      </div>
+      <img src="static/designs/{{d.image_path}}" class="card-img-top" style="max-height:400px; object-fit:cover">
+      <div class="card-body">
+
+        <p><b>No.of votes:</b> ({{d.no_of_votes}})</p>
+      </div>
+      <div class="card-footer">
+        {% set upvoted_before = namespace() %}
+        {% set upvoted_before.result = 0 %}
+        {% for u in d.voter %}
+        {% if u.username == current_user.username %} <!--Upvoted before -->
+        {% set upvoted_before.result = 1 %}
+        {% endif %}
+        {% endfor %}
+
+        {% if upvoted_before.result == 1 %}
+        <button type="button" class="btn btn-secondary" disabled>Voted</button>
+        {% elif d.user_name == current_user.username %}
+        <button type="button" class="btn btn-secondary" disabled>Upvote</button> <!--Same uploader-->
+        {% else %}
+        <form action="" method="post">
+          {{form.csrf_token()}}
+          {{form.id(value=d.id)}}
+          {{form.upvote(class="btn btn-primary", id="upvote")}}
+        </form>
+      {% endif %}
+      </div>
+    </div>
+  </div>
+  {% if (designs.index(d)+1) % 3 == 0 %}
+</div>
+  {% endif %}
+{% endfor %}
+
+
+{% endblock %}
